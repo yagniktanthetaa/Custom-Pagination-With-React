@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Pagination from "./Pagination";
 
-function App() {
+let PageSize = 10;
+const App = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/todos")
+      .then((response) => response.json())
+      .then((json) => setData(json));
+  }, []);
+
+  // const currentData = useMemo(() => {
+  //   const firstPageIndex = (currentPage - 1) * PageSize;
+  //   const lastPageIndex = firstPageIndex + PageSize;
+  //   return data.slice(firstPageIndex, lastPageIndex);
+  //   // eslint-disable-next-line
+  // }, [currentPage]);
+
+  const firstPageIndex = (currentPage - 1) * PageSize;
+  const lastPageIndex = firstPageIndex + PageSize;
+  const currentData = data.slice(firstPageIndex, lastPageIndex);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="main-app">
+        {currentData?.map((todo, index) => (
+          <p key={index}>{todo?.title}</p>
+        ))}
+        <Pagination
+          currentPage={currentPage}
+          totalCount={data.length}
+          pageSize={PageSize}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      </div>
+    </>
   );
-}
+};
 
 export default App;
